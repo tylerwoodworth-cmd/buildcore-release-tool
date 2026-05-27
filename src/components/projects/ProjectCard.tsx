@@ -1,13 +1,18 @@
 import Link from "next/link";
 import { Badge } from "@/components/ui/Badge";
 import { ProgressBar } from "@/components/ui/ProgressBar";
-import { PROJECT_STATUS_BADGE_KIND, getProjectCounts } from "@/lib/mock";
-import type { Project } from "@/lib/types";
+import { PROJECT_STATUS_BADGE_KIND } from "@/lib/mock";
+import type { Project, ProjectCounts } from "@/lib/types";
 
 /** Card representing one project on the Projects list. The colored left edge
     is the project's accent color. */
-export function ProjectCard({ project }: { project: Project }) {
-  const counts = getProjectCounts(project.id);
+export function ProjectCard({
+  project,
+  counts,
+}: {
+  project: Project;
+  counts: ProjectCounts;
+}) {
   const target = project.targetReleaseDate
     ? new Date(project.targetReleaseDate).toLocaleDateString("en-US", {
         month: "short",

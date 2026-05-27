@@ -1,14 +1,10 @@
 import { GitBranch, User, Link2 } from "lucide-react";
 import { Card, CardHeader, CardTitle } from "@/components/ui/Card";
-import { getProjectActivity } from "@/lib/mock";
+import type { ActivityEvent } from "@/lib/types";
 
-type Props = { projectName: string };
-
-/** Recent activity scoped to a single project (filtered from the cross-project
-    activity feed). */
-export function ProjectActivityCard({ projectName }: Props) {
-  const events = getProjectActivity(projectName);
-
+/** Recent activity scoped to a single project. Caller passes in the
+    pre-filtered event list (from db.getProjectActivity). */
+export function ProjectActivityCard({ events }: { events: ActivityEvent[] }) {
   return (
     <Card>
       <CardHeader>

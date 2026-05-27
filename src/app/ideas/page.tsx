@@ -1,5 +1,6 @@
 import { Plus, Lightbulb } from "lucide-react";
-import { MOCK_IDEAS, IDEA_KIND_INFO } from "@/lib/mock";
+import { IDEA_KIND_INFO } from "@/lib/mock";
+import { getAllIdeas } from "@/lib/db";
 import { IdeaCard } from "@/components/ideas/IdeaCard";
 import { IdeasTabs } from "@/components/ideas/IdeasTabs";
 import { StatusFilter } from "@/components/ideas/StatusFilter";
@@ -20,12 +21,13 @@ export default async function IdeasPage({ searchParams }: Props) {
       : "new_project";
   const activeStatus: IdeaStatus | "all" = statusParam ? (statusParam as IdeaStatus) : "all";
 
-  const inKind = MOCK_IDEAS.filter((i) => i.kind === activeKind);
+  const all = await getAllIdeas();
+  const inKind = all.filter((i) => i.kind === activeKind);
   const visible = inKind.filter((i) => activeStatus === "all" || i.status === activeStatus);
 
   const kindCounts = VALID_KINDS.reduce(
     (acc, k) => {
-      acc[k] = MOCK_IDEAS.filter((i) => i.kind === k).length;
+      acc[k] = all.filter((i) => i.kind === k).length;
       return acc;
     },
     {} as Record<IdeaKind, number>,

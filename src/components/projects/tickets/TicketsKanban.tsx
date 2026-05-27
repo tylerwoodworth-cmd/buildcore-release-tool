@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { GitBranch, Link as LinkIcon, ArrowRight } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
-import { TICKET_STAGES, PRIORITY_KIND, getFeatureById, getProjectTicketsFiltered } from "@/lib/mock";
+import { TICKET_STAGES, PRIORITY_KIND } from "@/lib/mock";
+import { getFeatureForProject, getProjectTickets, getProjectTicketsFiltered } from "@/lib/db";
 import type { Ticket } from "@/lib/types";
 
 type Props = {
@@ -12,10 +13,12 @@ type Props = {
 
 /** Kanban for the project's tickets. Reads filter state from the URL and
     narrows columns + counts when ?feature= is present. */
-export function TicketsKanban({ projectId, projectRepo, featureId }: Props) {
-  const all = getProjectTicketsFiltered(projectId, null);
-  const filtered = getProjectTicketsFiltered(projectId, featureId);
-  const feature = featureId ? getFeatureById(projectId, featureId) : null;
+export async function TicketsKanban({ projectId, projectRepo, featureId }: Props) {
+  const [all, filtered, feature] = await Promise.all([
+    getProjectTickets(projectId),
+    getProjectTicketsFiltered(projectId, featureId),
+    featureId ? getFeatureForProject(projectId, featureId) : Promise.resolve(null),
+  ]);
 
   return (
     <div>

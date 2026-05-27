@@ -1,8 +1,8 @@
 import { GitBranch, User, Link2 } from "lucide-react";
 import { Card, CardHeader, CardTitle } from "@/components/ui/Card";
-import { MOCK_ACTIVITY } from "@/lib/mock";
+import type { ActivityEvent } from "@/lib/types";
 
-export function ActivityCard() {
+export function ActivityCard({ events }: { events: ActivityEvent[] }) {
   return (
     <Card>
       <CardHeader>
@@ -14,7 +14,7 @@ export function ActivityCard() {
       </CardHeader>
 
       <div className="px-5 py-2">
-        {MOCK_ACTIVITY.map((a) => {
+        {events.map((a) => {
           const Icon =
             a.source === "agent" || a.source === "github"
               ? GitBranch

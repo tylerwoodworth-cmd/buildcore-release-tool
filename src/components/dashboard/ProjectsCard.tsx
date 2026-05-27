@@ -2,9 +2,10 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Card, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
-import { MOCK_PROJECTS, PROJECT_STATUS_BADGE_KIND } from "@/lib/mock";
+import { PROJECT_STATUS_BADGE_KIND } from "@/lib/mock";
+import type { Project } from "@/lib/types";
 
-export function ProjectsCard() {
+export function ProjectsCard({ projects }: { projects: Project[] }) {
   return (
     <Card>
       <CardHeader>
@@ -18,7 +19,7 @@ export function ProjectsCard() {
         </Link>
       </CardHeader>
 
-      {MOCK_PROJECTS.map((p) => {
+      {projects.map((p) => {
         const targetDate = p.targetReleaseDate
           ? new Date(p.targetReleaseDate).toLocaleDateString("en-US", {
               month: "short",

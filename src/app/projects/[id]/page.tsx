@@ -1,13 +1,14 @@
 import { notFound } from "next/navigation";
 import {
   getProject,
+  getProjectActivity,
   getProjectCounts,
   getProjectFeedback,
   getProjectPhases,
   getProjectTestCases,
   getTicketDetail,
   groupPendingByArea,
-} from "@/lib/mock";
+} from "@/lib/db";
 import { ProjectHeader } from "@/components/projects/ProjectHeader";
 import { ProjectTabs, type ProjectTab } from "@/components/projects/ProjectTabs";
 import { AboutCard } from "@/components/projects/overview/AboutCard";
@@ -39,43 +40,34 @@ const VALID_TABS: ProjectTab[] = [
 export default async function ProjectHubPage({ params, searchParams }: Props) {
   const { id } = await params;
   const { tab: tabParam, feature: featureParam, ticket: ticketParam } = await searchParams;
-  const project = getProject(id);
+  const project = await getProject(id);
   if (!project) notFound();
 
   const active: ProjectTab =
     tabParam && (VALID_TABS as string[]).includes(tabParam)
       ? (tabParam as ProjectTab)
       : "overview";
-  const counts = getProjectCounts(id);
+
+  const counts = await getProjectCounts(id);
   const openTicket =
-    active === "tickets" && ticketParam ? getTicketDetail(ticketParam) : null;
+    active === "tickets" && ticketParam ? await getTicketDetail(ticketParam) : null;
 
   return (
     <div>
       <ProjectHeader project={project} />
       <ProjectTabs projectId={id} active={active} counts={counts} />
 
-      {active === "overview" && (
-        <>
-          <div className="mb-6 grid grid-cols-1 gap-4 lg:grid-cols-[2fr_1fr]">
-            <AboutCard project={project} />
-            <SnapshotCard project={project} counts={counts} />
-          </div>
-          <div className="mb-6">
-            <ProductFeaturesCard projectId={id} features={project.features} counts={counts} />
-          </div>
-          <ProjectActivityCard projectName={project.name} />
-        </>
-      )}
+      {active === "overview" && <OverviewTab project={project} counts={counts} />}
 
       {active === "lifecycle" && (
         <>
           <div className="mb-6">
-            <ProjectGantt phases={getProjectPhases(id)} />
+            <ProjectGantt phases={await getProjectPhases(id)} />
           </div>
-          <PhaseChecklists phases={getProjectPhases(id)} />
+          <PhaseChecklists phases={await getProjectPhases(id)} />
         </>
       )}
+
       {active === "tickets" && (
         <>
           <TicketsKanban
@@ -86,14 +78,39 @@ export default async function ProjectHubPage({ params, searchParams }: Props) {
           {openTicket && <TicketDrawer ticket={openTicket} projectId={id} />}
         </>
       )}
-      {active === "feedback" && <FeedbackTable items={getProjectFeedback(id)} />}
+
+      {active === "feedback" && <FeedbackTable items={await getProjectFeedback(id)} />}
+
       {active === "testing" && (
-        <TestingTab features={project.features} cases={getProjectTestCases(id)} />
+        <TestingTab features={project.features} cases={await getProjectTestCases(id)} />
       )}
+
       {active === "pending" && (
-        <PendingTab project={project} groups={groupPendingByArea(id)} />
+        <PendingTab project={project} groups={await groupPendingByArea(id)} />
       )}
     </div>
   );
 }
 
+async function OverviewTab({
+  project,
+  counts,
+}: {
+  project: Awaited<ReturnType<typeof getProject>>;
+  counts: Awaited<ReturnType<typeof getProjectCounts>>;
+}) {
+  if (!project) return null;
+  const activity = await getProjectActivity(project.name);
+  return (
+    <>
+      <div className="mb-6 grid grid-cols-1 gap-4 lg:grid-cols-[2fr_1fr]">
+        <AboutCard project={project} />
+        <SnapshotCard project={project} counts={counts} />
+      </div>
+      <div className="mb-6">
+        <ProductFeaturesCard projectId={project.id} features={project.features} counts={counts} />
+      </div>
+      <ProjectActivityCard events={activity} />
+    </>
+  );
+}

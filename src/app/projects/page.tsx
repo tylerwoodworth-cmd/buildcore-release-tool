@@ -1,15 +1,19 @@
 import { Plus } from "lucide-react";
-import { MOCK_PROJECTS } from "@/lib/mock";
+import { getAllProjects, getProjectCounts } from "@/lib/db";
 import { ProjectCard } from "@/components/projects/ProjectCard";
 
-export default function ProjectsPage() {
+export default async function ProjectsPage() {
+  const projects = await getAllProjects();
+  const counts = await Promise.all(projects.map((p) => getProjectCounts(p.id)));
+  const projectsWithCounts = projects.map((p, i) => ({ project: p, counts: counts[i] }));
+
   return (
     <div>
       <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1>Projects</h1>
           <p className="mt-1.5 text-sm text-slate-600">
-            {MOCK_PROJECTS.length} active release projects
+            {projects.length} active release projects
           </p>
         </div>
         <button
@@ -22,8 +26,8 @@ export default function ProjectsPage() {
       </div>
 
       <div className="grid grid-cols-[repeat(auto-fill,minmax(360px,1fr))] gap-4">
-        {MOCK_PROJECTS.map((p) => (
-          <ProjectCard key={p.id} project={p} />
+        {projectsWithCounts.map(({ project, counts }) => (
+          <ProjectCard key={project.id} project={project} counts={counts} />
         ))}
       </div>
     </div>

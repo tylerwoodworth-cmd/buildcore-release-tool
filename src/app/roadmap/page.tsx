@@ -1,6 +1,7 @@
 import { Roadmap } from "@/components/roadmap/Roadmap";
-import { getAllProjectsForRoadmap } from "@/lib/mock";
+import { getAllProjectsForRoadmap } from "@/lib/db";
 
-export default function RoadmapPage() {
-  return <Roadmap rows={getAllProjectsForRoadmap()} />;
+export default async function RoadmapPage() {
+  const rows = await getAllProjectsForRoadmap();
+  return <Roadmap rows={rows} />;
 }

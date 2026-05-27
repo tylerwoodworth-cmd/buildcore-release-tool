@@ -5,8 +5,11 @@ import { ProjectsCard } from "@/components/dashboard/ProjectsCard";
 import { ActivityCard } from "@/components/dashboard/ActivityCard";
 import { TicketPipelineCard } from "@/components/dashboard/TicketPipelineCard";
 import { NeedsAttentionCard } from "@/components/dashboard/NeedsAttentionCard";
+import { getActivity, getAllProjects } from "@/lib/db";
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const [projects, activity] = await Promise.all([getAllProjects(), getActivity(8)]);
+
   return (
     <div>
       <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
@@ -37,8 +40,8 @@ export default function DashboardPage() {
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-[2fr_1fr]">
         <div className="flex flex-col gap-4">
-          <ProjectsCard />
-          <ActivityCard />
+          <ProjectsCard projects={projects} />
+          <ActivityCard events={activity} />
         </div>
         <div className="flex flex-col gap-4">
           <TicketPipelineCard />

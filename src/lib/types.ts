@@ -116,6 +116,7 @@ export type Feature = {
   name: string;
   description: string | null;
   status: FeatureStatus;
+  sortOrder?: number;
   ticketRefs: string[];
   timelineStart: number | null;
   timelineEnd: number | null;
