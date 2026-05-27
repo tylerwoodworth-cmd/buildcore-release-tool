@@ -58,7 +58,7 @@ export default async function IdeasPage({ searchParams }: Props) {
           style={{ background: "var(--bc-brand-600)" }}
         >
           <Plus size={14} />
-          New {kindInfo.label.toLowerCase()}
+          {kindInfo.label}
         </button>
       </div>
 

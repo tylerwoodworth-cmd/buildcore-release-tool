@@ -75,10 +75,23 @@ The only inbound integrations are read-only webhooks: Evan's agent posts ticket 
 
 ## Build order
 
-1. Scaffolding + layout shell (this commit) ✓
-2. Supabase schema + types
-3. Port screens from the prototype (Dashboard → Projects hub → Roadmap → Ideas)
-4. Webhook endpoints
-5. Realtime subscriptions
-6. v1 → v2 import script
-7. Vercel deploy
+1. Scaffolding + layout shell ✓
+2. Supabase schema + seed (apply via `supabase/migrations/` + `supabase/seed.sql`) ✓
+3. Port screens from the prototype ✓
+   - Dashboard (My tasks, KPIs, projects, activity, pipeline, needs attention)
+   - Projects list + Project hub
+     - Overview (About, Snapshot, Product features, Activity)
+     - Lifecycle (Gantt + phase checklists)
+     - Tickets (Kanban + handoff drawer + feature filter)
+     - Feedback (table)
+     - Testing (by-feature view with pass/fail breakdown)
+     - Pending (area-grouped, with per-area handoff prompt copy)
+   - Roadmap (project + feature timeline)
+   - Ideas (3-lane: New projects / New features / Enhancements)
+4. Webhook endpoints — TODO
+   - `/api/webhooks/github` (ticket sync from bid-sheet-v2 repo)
+   - `/api/webhooks/tickets` (Evan's agent posting status updates)
+   - `/api/webhooks/feedback` (BuildCore portal feedback submissions)
+5. Realtime — TODO (Supabase Realtime channels driving the sync indicator + live data)
+6. v1 → v2 import script — TODO
+7. Vercel deploy — TODO
