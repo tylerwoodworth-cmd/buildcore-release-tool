@@ -1004,3 +1004,14 @@ export const IDEA_KIND_INFO: Record<IdeaKind, { label: string; accent: BadgeKind
   new_feature: { label: "New feature", accent: "info",   iconName: "PlusCircle" },
   enhancement: { label: "Enhancement", accent: "purple", iconName: "Pencil" },
 };
+
+// ---------------------------------------------------------------------------
+// Roadmap helpers
+// ---------------------------------------------------------------------------
+export function getAllProjectsForRoadmap() {
+  return MOCK_PROJECTS.map((p) => ({
+    project: p,
+    phases: getProjectPhases(p.id),
+    features: FEATURES_BY_PROJECT[p.id] ?? [],
+  }));
+}
