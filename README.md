@@ -1,36 +1,84 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# BuildCore Release Tool (v2)
 
-## Getting Started
+Project-centric release planning, feature tracking, testing, and engineering-handoff coordination for BuildCore. **Sandboxed — does not write to the `bid-sheet-v2` production database, repo, or runtime.**
 
-First, run the development server:
+## Stack
+
+- Next.js 16 (App Router) + TypeScript
+- Tailwind CSS (CSS-first theme, BuildCore tokens in `src/app/globals.css`)
+- Supabase (Postgres + Realtime) — separate project from bid-sheet-v2
+- TanStack Query for client cache
+- Lucide icons
+- Vercel deployment
+
+## Local development
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# Use Tyler's node install on macOS
+export PATH="/Users/tylerwoodworth/local/node/bin:$PATH"
+
+npm install      # one-time
+cp .env.example .env.local   # then fill in values
+npm run dev -- --port 3100
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3100. If `GATE_PASSWORD` is unset in development the password gate is bypassed; in production it's required.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Environment variables
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+See `.env.example`. The important ones:
 
-## Learn More
+- `GATE_PASSWORD` — shared password for the unlock screen
+- `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` — client-side Supabase connection
+- `SUPABASE_SERVICE_ROLE_KEY` — server-only, used by webhook handlers
+- `TICKETS_WEBHOOK_SECRET`, `GITHUB_WEBHOOK_SECRET`, `FEEDBACK_WEBHOOK_SECRET` — webhook signing secrets
 
-To learn more about Next.js, take a look at the following resources:
+## Layout
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+src/
+  app/
+    layout.tsx          # Root layout — loads Roboto + AppShell
+    page.tsx            # Dashboard
+    roadmap/page.tsx
+    projects/page.tsx
+    ideas/page.tsx
+    unlock/page.tsx     # Password gate UI
+    api/
+      unlock/route.ts   # Sets the gate cookie
+      webhooks/         # (Phase 4) GitHub, tickets, feedback intake
+  components/
+    layout/
+      AppShell.tsx      # Sidebar + Topbar + content slot
+      Sidebar.tsx
+      Topbar.tsx
+      SyncIndicator.tsx # Realtime connection status pill
+    PagePlaceholder.tsx # Stand-in until pages are ported from the prototype
+  lib/
+    cn.ts               # Class merger helper
+  middleware.ts         # Password gate enforcement
+supabase/
+  migrations/           # (Phase 2) SQL migrations
+scripts/
+  import-from-v1.ts     # (Phase 6) One-shot v1 → v2 data import
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## What's isolated from bid-sheet-v2
 
-## Deploy on Vercel
+- Separate Supabase project (its own URL + keys)
+- Separate GitHub repo
+- Separate Vercel project
+- Separate auth (currently a single shared password)
+- No code path here ever writes back to bid-sheet-v2
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+The only inbound integrations are read-only webhooks: Evan's agent posts ticket status here, the BuildCore portal posts feedback here. Outbound to bid-sheet-v2: zero.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Build order
+
+1. Scaffolding + layout shell (this commit) ✓
+2. Supabase schema + types
+3. Port screens from the prototype (Dashboard → Projects hub → Roadmap → Ideas)
+4. Webhook endpoints
+5. Realtime subscriptions
+6. v1 → v2 import script
+7. Vercel deploy

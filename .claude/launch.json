@@ -1,0 +1,14 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "dev",
+      "runtimeExecutable": "/Users/tylerwoodworth/local/node/bin/npm",
+      "runtimeArgs": ["run", "dev", "--", "--port", "3100"],
+      "port": 3100,
+      "env": {
+        "PATH": "/Users/tylerwoodworth/local/node/bin:/usr/local/bin:/usr/bin:/bin"
+      }
+    }
+  ]
+}
