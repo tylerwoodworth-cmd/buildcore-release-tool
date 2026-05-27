@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { Plus } from "lucide-react";
 import { getAllProjects, getProjectCounts } from "@/lib/db";
 import { ProjectCard } from "@/components/projects/ProjectCard";

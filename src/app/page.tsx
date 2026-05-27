@@ -1,3 +1,6 @@
+// Always render on request so Supabase reads reflect the latest data.
+export const dynamic = "force-dynamic";
+
 import { Plus } from "lucide-react";
 import { MyTasks } from "@/components/dashboard/MyTasks";
 import { StatGrid } from "@/components/dashboard/StatGrid";

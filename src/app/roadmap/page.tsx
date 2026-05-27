@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { Roadmap } from "@/components/roadmap/Roadmap";
 import { getAllProjectsForRoadmap } from "@/lib/db";
 
